@@ -1,0 +1,1 @@
+Admin login is just email + password, and register is statically done with initAdmin()!
