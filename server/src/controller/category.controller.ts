@@ -1,15 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { Category } from "../models/category.model";
 import { CustomError } from "../helper/customError";
 import { CategoryValidation } from "../validations/category.validation";
 import { removeFile } from "../helper/removeFile";
+import { CategoryService } from "../services/category.service";
 
 export const categoryController = {
   async createCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, description, isActive, sortOrder } = await CategoryValidation.createCategory(req.body);
+      const { name, description, isActive, sortOrder } =
+        await CategoryValidation.createCategory(req.body);
 
-      const category = await Category.create({
+      const category = await CategoryService.createCategory({
         name: JSON.parse(name),
         description: JSON.parse(description),
         image: req.file?.filename,
@@ -28,7 +29,7 @@ export const categoryController = {
 
   async getAllCategories(req: Request, res: Response, next: NextFunction) {
     try {
-      const categories = await Category.findAll();
+      const categories = await CategoryService.getAllCategories();
       res.status(200).json({
         ok: true,
         categories,
@@ -41,7 +42,7 @@ export const categoryController = {
   async getCategoryById(req: Request, res: Response, next: NextFunction) {
     try {
       const categoryId = req?.params?.id;
-      const category = await Category.findByPk(categoryId);
+      const category = await CategoryService.getCategoryById(categoryId);
       if (!category) {
         throw new CustomError("Category not found", 404);
       }
@@ -57,9 +58,10 @@ export const categoryController = {
   async updateCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const categoryId = req?.params?.id;
-      const { name, description, isActive, sortOrder } = await CategoryValidation.updateCategory(req.body);
+      const { name, description, isActive, sortOrder } =
+        await CategoryValidation.updateCategory(req.body);
 
-      const category = await Category.findByPk(categoryId);
+      const category = await CategoryService.getCategoryById(categoryId);
 
       if (!category) {
         throw new CustomError("Category not found", 404);
@@ -67,7 +69,7 @@ export const categoryController = {
 
       await removeFile(category?.dataValues?.image);
 
-      await category.update({
+      await CategoryService.updateCategory(categoryId, {
         name: JSON.parse(name),
         description: JSON.parse(description),
         image: req.file?.filename,
@@ -88,12 +90,14 @@ export const categoryController = {
   async deleteCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const categoryId = req?.params?.id;
-      const category = await Category.findByPk(categoryId);
+      const category = await CategoryService.getCategoryById(categoryId);
       if (!category) {
         throw new CustomError("Category not found", 404);
       }
       await removeFile(category?.dataValues?.image);
-      await category.destroy();
+
+      await CategoryService.deleteCategory(categoryId);
+      
       res.status(200).json({
         ok: true,
         message: "Category deleted successfully",

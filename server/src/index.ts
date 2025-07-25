@@ -2,9 +2,11 @@ import express from "express";
 import "dotenv/config";
 import { urlencoded } from "body-parser";
 import sequelize from "./db/database";
-import { initAdmin } from "./helper/init";
 import adminRouter from "./routes/admin/admin.routes";
 import categoryRouter from "./routes/admin/category.routes";
+import productRouter from "./routes/admin/product.routes";
+
+import { initAdmin } from "./helper/init";
 import { errorMiddleware } from "./middleware/error.middleware";
 import path from "path";
 
@@ -20,6 +22,7 @@ app.get("/", (_req, res) => {
 
 app.use("/admin/auth", adminRouter);
 app.use("/admin/category", categoryRouter);
+app.use("/admin/product", productRouter);
 
 app.use("/files", express.static(path.join(__dirname, "./public/files")));
 

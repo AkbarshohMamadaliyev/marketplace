@@ -1,8 +1,8 @@
 import Joi from "joi";
 import { CustomError } from "../helper/customError";
 
-export class CategoryValidation extends Error {
-  static async createCategory(data: any) {
+export class ProductValidation extends Error {
+  static async createProduct(data: any) {
     return await Joi.object({
       name: Joi.string()
         .required()
@@ -10,6 +10,20 @@ export class CategoryValidation extends Error {
       description: Joi.string()
         .optional()
         .error(new CustomError("Description must be an object", 400)),
+      price: Joi.number()
+        .precision(2)
+        .required()
+        .error(new CustomError("Price is required and must be a number", 400)),
+      stock: Joi.number()
+        .integer()
+        .min(0)
+        .optional()
+        .error(new CustomError("Stock must be a non-negative integer", 400)),
+      minStock: Joi.number()
+        .integer()
+        .min(0)
+        .optional()
+        .error(new CustomError("minStock must be a non-negative integer", 400)),
       isActive: Joi.boolean()
         .optional()
         .error(new CustomError("isActive must be a boolean", 400)),
@@ -20,7 +34,7 @@ export class CategoryValidation extends Error {
     }).validateAsync(data);
   }
 
-  static async updateCategory(data: any) {
+  static async updateProduct(data: any) {
     return await Joi.object({
       name: Joi.string()
         .optional()
@@ -28,6 +42,20 @@ export class CategoryValidation extends Error {
       description: Joi.string()
         .optional()
         .error(new CustomError("Description must be an object", 400)),
+      price: Joi.number()
+        .precision(2)
+        .optional()
+        .error(new CustomError("Price must be a number", 400)),
+      stock: Joi.number()
+        .integer()
+        .min(0)
+        .optional()
+        .error(new CustomError("Stock must be a non-negative integer", 400)),
+      minStock: Joi.number()
+        .integer()
+        .min(0)
+        .optional()
+        .error(new CustomError("minStock must be a non-negative integer", 400)),
       isActive: Joi.boolean()
         .optional()
         .error(new CustomError("isActive must be a boolean", 400)),
